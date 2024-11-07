@@ -25,6 +25,7 @@ class MessageLogResponse(BaseModel):
     delivery_status: str
     logged_at: datetime
     error_message: Optional[str] = None
+    provider_response: Optional[str] = None
     
     model_config = {
         'from_attributes': True  # For SQLAlchemy compatibility

@@ -40,6 +40,7 @@ class MessageLog(db.Model):
     delivery_status = db.Column(db.String(20), nullable=False)
     logged_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     error_message = db.Column(Text)
+    provider_response = db.Column(Text) 
 
     message = relationship("Message", back_populates="logs")
     
@@ -50,11 +51,13 @@ class MessageLog(db.Model):
             'delivery_status={2}, '
             'logged_at={3}, '
             'error_message={4}>'
+            'provider_response={5}>'
             .format(
                 self.id,
                 self.message_id,
                 self.delivery_status,
                 self.logged_at,
-                self.error_message
+                self.error_message,
+                self.provider_response
             )
         )

@@ -16,7 +16,8 @@ CREATE TABLE message_logs (
     message_id UUID REFERENCES messages(id),
     delivery_status VARCHAR(20) NOT NULL,  -- 'pending', 'delivered', 'failed'
     logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    error_message TEXT
+    error_message TEXT,
+    provider_response TEXT
 );
 
 -- Indexes for faster querying based on channel_type and message_ID
