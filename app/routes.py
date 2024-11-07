@@ -30,14 +30,17 @@ def send_message():
 	try:
 		# Validate request data using Pydantic
 		request_data = MessageRequest(**request.json)
-            
+		logger.info(f"Received message request for {request_data.channel_type} channel to {request_data.recipient}")
+        
 		# Get appropriate service
 		service = services.get(request_data.channel_type.lower())
 		if not service:
+			logger.error(f"Unsupported channel type: {request_data.channel_type}")
 			return jsonify({"error": f"Unsupported channel type: {request_data.channel_type}"}), 400
 
         # Validate recipient format
 		if not service.validate_recipient(request_data.recipient):
+			logger.error(f"Invalid recipient format: {request_data.recipient}")
 			return jsonify({"error": "Invalid recipient format"}), 400
 	
 		# Create new message
@@ -47,15 +50,15 @@ def send_message():
 			content=request_data.content
 		)
 
+		logger.info(f"Adding new message for {request_data.recipient} via {request_data.channel_type}...")
 		db.session.add(message)
+		logger.info(f"Flushing message to database")
 		db.session.flush()
 
 		# Attempt to send message
+		logger.info(f"Attempting to send message to {request_data.recipient} via {request_data.channel_type} service...")
 		result = service.send_message(request_data.recipient, request_data.content)
 		
-		print("Debugging empty messge_id")
-		print(message.id)
-
 		# Add initial log entry
 		log = MessageLog(
 			message_id=message.id,
@@ -65,9 +68,11 @@ def send_message():
 			provider_response=result.get("provider_response")
 		)
 
+		logger.info(f"Adding new message log for {request_data.recipient} via {request_data.channel_type}...")
 		db.session.add(log)
 		
 		# Commit both message and log
+		logger.info(f"Committing message and log to database")
 		db.session.commit()
 		
 		# Return response using Pydantic model
@@ -79,10 +84,14 @@ def send_message():
 			created_at=message.created_at
 		)
 		
+		logger.info(f"Returning response for {request_data.recipient} via {request_data.channel_type}...")
 		return jsonify(response.model_dump()), 201
 	except ValidationError as e:
+		logger.error(f"Validation error: {e}")
 		return jsonify({'error': str(e)}), 400
 	except Exception as e:
+		logger.error(f"Error: {e}")
+		logger.error(f"Rolling back database session...")
 		db.session.rollback()
 		return jsonify({'error': str(e)}), 500
 
@@ -91,6 +100,8 @@ def get_messages():
     """Get all messages"""
     try:
         messages = Message.query.all()
+        logger.info(f"Returning {len(messages)} messages...")
+
         return jsonify([{
             'id': str(msg.id),
             'channel_type': msg.channel_type,
@@ -100,6 +111,7 @@ def get_messages():
         } for msg in messages])
     
     except Exception as e:
+        logger.error(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/getMessageLogs', methods=['GET'])
@@ -107,6 +119,8 @@ def get_message_logs():
     """Get all message logs"""    
     try:
         message_logs = MessageLog.query.all()
+        logger.info(f"Returning {len(message_logs)} message logs...")
+
         return jsonify([{
             'id': str(log.id),
             'message_id': str(log.message_id),
@@ -117,4 +131,5 @@ def get_message_logs():
         } for log in message_logs])
     
     except Exception as e:
+        logger.error(f"Error: {e}")
         return jsonify({'error': str(e)}), 500

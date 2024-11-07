@@ -6,6 +6,7 @@ from .message_service import MessageService
 class EmailService(MessageService):
     def validate_recipient(self, recipient: str) -> bool:
         """Validate email format"""
+        logging.info(f"Validating email: {recipient}")
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.match(email_regex, recipient))
     

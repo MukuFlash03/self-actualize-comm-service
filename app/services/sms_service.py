@@ -6,6 +6,7 @@ from .message_service import MessageService
 class SMSService(MessageService):
     def validate_recipient(self, recipient: str) -> bool:
         """Validate phone number format (basic example)"""
+        logging.info(f"Validating phone number: {recipient}")
         phone_regex = r'^\+?1?\d{9,15}$'
         return bool(re.match(phone_regex, recipient))
     
