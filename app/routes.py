@@ -5,6 +5,13 @@ from app.services.email_service import EmailService
 from app.services.sms_service import SMSService
 from app import db
 from pydantic import ValidationError
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 api_bp = Blueprint('api', __name__)
 
@@ -41,6 +48,7 @@ def send_message():
 		)
 
 		db.session.add(message)
+		db.session.flush()
 
 		# Attempt to send message
 		result = service.send_message(request_data.recipient, request_data.content)

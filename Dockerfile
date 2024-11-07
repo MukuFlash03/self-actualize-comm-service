@@ -1,5 +1,7 @@
 FROM python:3.10-alpine3.20
 
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app/communication-microservice
 
 RUN apk add --no-cache bash
