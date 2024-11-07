@@ -9,10 +9,19 @@ class MessageRequest(BaseModel):
     content: str
 
 class MessageResponse(BaseModel):
-    message_id: UUID
-    status: str
+    id: UUID
+    channel_type: Literal['email', 'sms']
+    recipient: str
+    content: str
+    created_at: datetime
+    
+    model_config = {
+        'from_attributes': True  # For SQLAlchemy compatibility
+    }
 
 class MessageLogResponse(BaseModel):
+    id: UUID
+    message_id: UUID
     delivery_status: str
     logged_at: datetime
     error_message: Optional[str] = None

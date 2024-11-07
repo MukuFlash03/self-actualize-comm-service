@@ -39,8 +39,11 @@ def send_message():
 		
 		# Return response using Pydantic model
 		response = MessageResponse(
-			message_id=message.id,
-			status='pending'
+      		id=message.id,
+			channel_type=message.channel_type,
+			recipient=message.recipient,
+			content=message.content,
+			created_at=message.created_at
 		)
 		
 		return jsonify(response.model_dump()), 201
