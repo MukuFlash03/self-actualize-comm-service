@@ -1,20 +1,59 @@
 import unittest
 from app import create_app, db
+import time
+import os
 
 class TestMessageAPI(unittest.TestCase):
+    # @classmethod
+    # def setUpClass(cls):
+    #     cls.app = create_app()
+    #     cls.app.config['TESTING'] = True
+    #     cls.client = cls.app.test_client()
+
     @classmethod
     def setUpClass(cls):
+        """Setup test app"""
         cls.app = create_app()
         cls.app.config['TESTING'] = True
+        cls.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
         cls.client = cls.app.test_client()
+        
+        # Ensure database is ready
+        cls.wait_for_db()
+        
+        # Create tables
+        with cls.app.app_context():
+            db.create_all()
+
+    @classmethod
+    def wait_for_db(cls):
+        """Wait for database to be ready"""
+        max_retries = 30
+        retry_interval = 1
+        
+        with cls.app.app_context():
+            for i in range(max_retries):
+                try:
+                    db.engine.connect()
+                    return
+                except Exception as e:
+                    if i == max_retries - 1:
+                        raise
+                    time.sleep(retry_interval)
 
     def setUp(self):
         with self.app.app_context():
-            db.create_all()
+            db.session.begin_nested()
 
     def tearDown(self):
         with self.app.app_context():
+            db.session.rollback()
             db.session.remove()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Cleanup after all tests"""
+        with cls.app.app_context():
             db.drop_all()
 
     def test_send_valid_email_message(self):
