@@ -78,6 +78,27 @@ class TestMessageAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIn('id', response.json)
 
+    def test_successful_email_message(self):
+        """Test successful email message submission"""
+        payload = {
+            "channel_type": "email",
+            "recipient": "test@example.com",
+            "content": "Test email content"
+        }
+        
+        response = self.client.post('/api/sendMessage', json=payload)
+        data = response.get_json()
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('id', data)
+        self.assertIn('channel_type', data)
+        self.assertIn('recipient', data)
+        
+        # Validate data
+        self.assertEqual(data['channel_type'], 'email')
+        self.assertEqual(data['recipient'], 'test@example.com')
+        self.assertEqual(data['content'], 'Test email content')
+
     def test_send_invalid_channel_type(self):
         """Test sending message with invalid channel type"""
         payload = {
@@ -99,6 +120,18 @@ class TestMessageAPI(unittest.TestCase):
         response = self.client.post('/api/sendMessage', json=payload)
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', response.json)
+
+    def test_missing_required_fields(self):
+      """Test missing required fields"""
+      payload = {
+          "channel_type": "email",
+          "recipient": "test@example.com"
+          # missing content
+      }
+      
+      response = self.client.post('/api/sendMessage', json=payload)
+      self.assertEqual(response.status_code, 400)
+      self.assertIn('error', response.get_json())
 
 if __name__ == '__main__':
     unittest.main()

@@ -77,11 +77,11 @@ def send_message():
 		
 		# Return response using Pydantic model
 		response = MessageResponse(
-      		id=message.id,
-			channel_type=message.channel_type,
-			recipient=message.recipient,
-			content=message.content,
-			created_at=message.created_at
+        id=message.id,
+        channel_type=message.channel_type,
+        recipient=message.recipient,
+        content=message.content,
+        created_at=message.created_at
 		)
 		
 		logger.info(f"Returning response for {request_data.recipient} via {request_data.channel_type}...")
