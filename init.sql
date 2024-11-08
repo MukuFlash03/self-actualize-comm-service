@@ -29,5 +29,5 @@ CREATE INDEX idx_messages_channel ON messages(channel_type);
 CREATE INDEX idx_message_logs_message_id ON message_logs(message_id);
 
 -- Grant permissions
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO postgres;
+-- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
+-- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO postgres;

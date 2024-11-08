@@ -1,6 +1,8 @@
 services:
   test-backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     environment:
       DATABASE_URL: postgresql://testuser:testpass@test-db:5432/test_db
     depends_on:
