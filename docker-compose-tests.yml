@@ -2,8 +2,8 @@ services:
   test-backend:
     build: .
     environment:
-      DATABASE_URL: postgresql://testuser:testpass@test-db:5432/test_db
       # PYTHONPATH: /app/communication-microservice
+      DATABASE_URL: postgresql://testuser:testpass@test-db:5432/test_db
     depends_on:
       test-db:
         condition: service_healthy
