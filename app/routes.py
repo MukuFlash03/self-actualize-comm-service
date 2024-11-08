@@ -20,11 +20,11 @@ services = {
     'sms': SMSService()
 }
 
-@api_bp.route('/hello')
+@api_bp.route('/')
 def hello():
     return "Hello from Communication Microservice!"
 
-@api_bp.route('/sendMessage', methods=['POST'])
+@api_bp.route('/api/sendMessage', methods=['POST'])
 def send_message():
 	"""Send a message"""
 	try:
@@ -95,7 +95,7 @@ def send_message():
 		db.session.rollback()
 		return jsonify({'error': str(e)}), 500
 
-@api_bp.route('/getMessages', methods=['GET'])
+@api_bp.route('/api/getMessages', methods=['GET'])
 def get_messages():
     """Get all messages"""
     try:
@@ -114,7 +114,7 @@ def get_messages():
         logger.error(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
 
-@api_bp.route('/getMessageLogs', methods=['GET'])
+@api_bp.route('/api/getMessageLogs', methods=['GET'])
 def get_message_logs():
     """Get all message logs"""    
     try:
