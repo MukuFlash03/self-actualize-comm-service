@@ -31,6 +31,9 @@ jobs:
     env:
       DOCKER_USER: ${{secrets.DOCKER_USER}}
       DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      POSTGRES_USER: ${{secrets.POSTGRES_USER}}
+      POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+      POSTGRES_DB: ${{secrets.POSTGRES_DB}}
 
     steps:
     - uses: actions/checkout@v4
@@ -50,8 +53,6 @@ jobs:
 
     - name: Deploy to local environment
       run: |
-        set -a; source .env; set +a
-        
         # Stop any running containers
         docker compose down || true
         
