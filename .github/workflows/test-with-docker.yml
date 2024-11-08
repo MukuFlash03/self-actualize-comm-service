@@ -1,0 +1,49 @@
+name: test-with-docker
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Make sure that the workflow works
+      run: echo "Running tests in docker container"
+
+    - name: Run tests using docker compose
+      run: |
+        docker compose -f docker-compose-tests.yml up --build --exit-code-from test-backend
+
+  build-and-push:
+    name: Build and Push Docker Image
+    needs: run-tests
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    env:
+      DOCKER_USER: ${{secrets.DOCKER_USER}}
+      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: docker login
+      run: | 
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USER }}/communication-microservice:latest
+          ${{ secrets.DOCKER_USER }}/communication-microservice:${{ github.sha }}

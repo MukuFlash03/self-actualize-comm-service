@@ -1,0 +1,24 @@
+services:
+  test-backend:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://testuser:testpass@test-db:5432/test_db
+    depends_on:
+      - test-db
+    networks:
+      - test-network
+    command: python -m unittest discover -s tests -p Test*;
+
+  test-db:
+    image: postgres:16-alpine3.18
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+      - POSTGRES_DB=test_db
+    networks:
+      - test-network
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+networks:
+  test-network:
