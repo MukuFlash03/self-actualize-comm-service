@@ -1,3 +1,6 @@
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Message types enum; can be expanded to include additional channels
 CREATE TYPE channel_type AS ENUM ('email', 'sms');
 
@@ -24,3 +27,7 @@ CREATE TABLE message_logs (
 -- Indexes for faster querying based on channel_type and message_ID
 CREATE INDEX idx_messages_channel ON messages(channel_type);
 CREATE INDEX idx_message_logs_message_id ON message_logs(message_id);
+
+-- Grant permissions
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO postgres;

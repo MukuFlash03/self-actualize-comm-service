@@ -164,3 +164,5 @@ cython_debug/
 
 # DB volume
 postgres_data/
+
+*.pem
