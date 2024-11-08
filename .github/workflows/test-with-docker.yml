@@ -47,3 +47,20 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_USER }}/communication-microservice:latest
           ${{ secrets.DOCKER_USER }}/communication-microservice:${{ github.sha }}
+
+    - name: Deploy to local environment
+      run: |
+        # Stop any running containers
+        docker compose down || true
+        
+        # Pull latest images
+        docker compose pull
+        
+        # Start services in detached mode
+        docker compose up -d
+        
+        # Wait for services to be ready
+        sleep 10
+        
+        # Verify deployment
+        curl http://localhost:5000/api/hello || exit 1

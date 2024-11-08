@@ -2,14 +2,12 @@ services:
   test-backend:
     build: .
     environment:
-      # PYTHONPATH: /app/communication-microservice
       DATABASE_URL: postgresql://testuser:testpass@test-db:5432/test_db
     depends_on:
       test-db:
         condition: service_healthy
     networks:
       - test-network
-    # command: python -m unittest discover -s tests -p Test*;
     command: >
       sh -c "
         echo 'Waiting for database...' &&
