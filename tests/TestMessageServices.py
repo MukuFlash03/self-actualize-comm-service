@@ -56,7 +56,7 @@ class TestMessageServices(unittest.TestCase):
     def test_invalid_phone_numbers(self):
         """Test various invalid phone number formats"""
         invalid_phones = [
-            "",                # Empty
+            "",               # Empty
             "123",            # Too short
             "abcdefghij",     # Contains non-digits
         ]

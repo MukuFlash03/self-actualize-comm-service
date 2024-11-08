@@ -4,12 +4,6 @@ import time
 import os
 
 class TestMessageAPI(unittest.TestCase):
-    # @classmethod
-    # def setUpClass(cls):
-    #     cls.app = create_app()
-    #     cls.app.config['TESTING'] = True
-    #     cls.client = cls.app.test_client()
-
     @classmethod
     def setUpClass(cls):
         """Setup test app"""
@@ -42,18 +36,23 @@ class TestMessageAPI(unittest.TestCase):
                     time.sleep(retry_interval)
 
     def setUp(self):
-        with self.app.app_context():
-            db.session.begin_nested()
+            with self.app.app_context():
+                # Create a savepoint that we can rollback to after each test
+                db.session.begin_nested()
 
     def tearDown(self):
+        """Clean up after each test by rolling back database changes"""
         with self.app.app_context():
+            # Rollback to the savepoint created in setUp
             db.session.rollback()
+            # Remove the session to ensure clean state
             db.session.remove()
 
     @classmethod
     def tearDownClass(cls):
         """Cleanup after all tests"""
         with cls.app.app_context():
+            # Drop all tables
             db.drop_all()
 
     def test_send_valid_email_message(self):
@@ -63,7 +62,9 @@ class TestMessageAPI(unittest.TestCase):
             "recipient": "test@example.com",
             "content": "Test email"
         }
+
         response = self.client.post('/api/sendMessage', json=payload)
+
         self.assertEqual(response.status_code, 201)
         self.assertIn('id', response.json)
 
@@ -74,7 +75,9 @@ class TestMessageAPI(unittest.TestCase):
             "recipient": "+1234567890",
             "content": "Test SMS"
         }
+
         response = self.client.post('/api/sendMessage', json=payload)
+
         self.assertEqual(response.status_code, 201)
         self.assertIn('id', response.json)
 
@@ -94,7 +97,7 @@ class TestMessageAPI(unittest.TestCase):
         self.assertIn('channel_type', data)
         self.assertIn('recipient', data)
         
-        # Validate data
+        # Validating that response data should match the request data
         self.assertEqual(data['channel_type'], 'email')
         self.assertEqual(data['recipient'], 'test@example.com')
         self.assertEqual(data['content'], 'Test email content')
@@ -106,7 +109,9 @@ class TestMessageAPI(unittest.TestCase):
             "recipient": "test@example.com",
             "content": "Test"
         }
+
         response = self.client.post('/api/sendMessage', json=payload)
+
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', response.json)
 
@@ -117,7 +122,9 @@ class TestMessageAPI(unittest.TestCase):
             "recipient": "invalid-email",
             "content": "Test"
         }
+
         response = self.client.post('/api/sendMessage', json=payload)
+
         self.assertEqual(response.status_code, 400)
         self.assertIn('error', response.json)
 
@@ -126,10 +133,11 @@ class TestMessageAPI(unittest.TestCase):
       payload = {
           "channel_type": "email",
           "recipient": "test@example.com"
-          # missing content
+          # missing content field
       }
       
       response = self.client.post('/api/sendMessage', json=payload)
+      
       self.assertEqual(response.status_code, 400)
       self.assertIn('error', response.get_json())
 

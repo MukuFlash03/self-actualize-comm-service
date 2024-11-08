@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Get DATABASE_URL from SSM Parameter Store
+# Need to add an IAM role with permissions to read the parameter
 DATABASE_URL=$(aws ssm get-parameter \
     --name "/prod/comm-service-backend/DATABASE_URL" \
     --with-decryption \

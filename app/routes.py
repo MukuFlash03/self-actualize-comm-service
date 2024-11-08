@@ -7,23 +7,30 @@ from app import db
 from pydantic import ValidationError
 import logging
 
+# Configure basic logging settings with timestamp, logger name, level and message
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+# Create a logger instance for this module
 logger = logging.getLogger(__name__)
 
+# Create a Blueprint instance for the API routes
 api_bp = Blueprint('api', __name__)
 
+# Define a dictionary of available message services, can be extended to include other services
 services = {
     'email': EmailService(),
     'sms': SMSService()
 }
 
+# Define a route for the root URL
 @api_bp.route('/')
 def hello():
     return "Hello from Communication Microservice!"
 
+# Define a route for sending a message
 @api_bp.route('/api/sendMessage', methods=['POST'])
 def send_message():
 	"""Send a message"""
@@ -38,7 +45,7 @@ def send_message():
 			logger.error(f"Unsupported channel type: {request_data.channel_type}")
 			return jsonify({"error": f"Unsupported channel type: {request_data.channel_type}"}), 400
 
-        # Validate recipient format
+    # Validate recipient format
 		if not service.validate_recipient(request_data.recipient):
 			logger.error(f"Invalid recipient format: {request_data.recipient}")
 			return jsonify({"error": "Invalid recipient format"}), 400
@@ -50,8 +57,11 @@ def send_message():
 			content=request_data.content
 		)
 
+    # Add message to database
 		logger.info(f"Adding new message for {request_data.recipient} via {request_data.channel_type}...")
 		db.session.add(message)
+    
+    # Commit message to database
 		logger.info(f"Flushing message to database")
 		db.session.flush()
 
@@ -68,6 +78,7 @@ def send_message():
 			provider_response=result.get("provider_response")
 		)
 
+    # Add log entry to database
 		logger.info(f"Adding new message log for {request_data.recipient} via {request_data.channel_type}...")
 		db.session.add(log)
 		
@@ -95,10 +106,12 @@ def send_message():
 		db.session.rollback()
 		return jsonify({'error': str(e)}), 500
 
+# Define a route for getting all messages
 @api_bp.route('/api/getMessages', methods=['GET'])
 def get_messages():
     """Get all messages"""
     try:
+        # Get all messages from database using SQLAlchemy ORM
         messages = Message.query.all()
         logger.info(f"Returning {len(messages)} messages...")
 
@@ -114,10 +127,12 @@ def get_messages():
         logger.error(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
 
+# Define a route for getting all message logs
 @api_bp.route('/api/getMessageLogs', methods=['GET'])
 def get_message_logs():
     """Get all message logs"""    
     try:
+        # Get all message logs from database using SQLAlchemy ORM
         message_logs = MessageLog.query.all()
         logger.info(f"Returning {len(message_logs)} message logs...")
 

@@ -1,7 +1,6 @@
 FROM python:3.10-alpine3.20
 
-ENV DATABASE_URL="sqlite:///test.db"
-
+# Prevents Python from buffering stdout and stderr streams
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app/communication-microservice
