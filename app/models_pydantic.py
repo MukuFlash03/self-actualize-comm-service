@@ -23,6 +23,7 @@ class MessageLogResponse(BaseModel):
     id: UUID
     message_id: UUID
     delivery_status: str
+    created_at: datetime
     logged_at: datetime
     error_message: Optional[str] = None
     provider_response: Optional[str] = None

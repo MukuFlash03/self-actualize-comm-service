@@ -38,6 +38,7 @@ class MessageLog(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     message_id = db.Column(UUID(as_uuid=True), db.ForeignKey('messages.id'), nullable=False)
     delivery_status = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     logged_at = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
     error_message = db.Column(Text)
     provider_response = db.Column(Text) 

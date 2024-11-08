@@ -62,9 +62,9 @@ def send_message():
 		# Add initial log entry
 		log = MessageLog(
 			message_id=message.id,
-			# delivery_status='pending'
-            delivery_status=result["status"],
-            error_message=result.get("error"),
+			created_at=message.created_at,
+      delivery_status=result["status"],
+      error_message=result.get("error"),
 			provider_response=result.get("provider_response")
 		)
 
@@ -125,6 +125,7 @@ def get_message_logs():
             'id': str(log.id),
             'message_id': str(log.message_id),
             'delivery_status': log.delivery_status,
+            'created_at': log.created_at.isoformat(),
             'logged_at': log.logged_at.isoformat(),
             'error_message': log.error_message,
             'provider_response': log.provider_response

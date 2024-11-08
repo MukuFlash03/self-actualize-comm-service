@@ -15,6 +15,7 @@ CREATE TABLE message_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     message_id UUID REFERENCES messages(id),
     delivery_status VARCHAR(20) NOT NULL,  -- 'pending', 'delivered', 'failed'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     error_message TEXT,
     provider_response TEXT
