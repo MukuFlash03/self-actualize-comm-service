@@ -66,4 +66,4 @@ jobs:
         sleep 10
         
         # Verify deployment
-        curl http://localhost:5000/api/hello || exit 1
+        curl http://localhost:5000/ || exit 1
